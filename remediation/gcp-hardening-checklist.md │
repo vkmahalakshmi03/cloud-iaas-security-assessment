@@ -1,0 +1,119 @@
+# GCP IaaS Hardening Checklist
+
+Mapped to CIS GCP Benchmark v1.3. Apply these controls immediately after provisioning any IaaS environment.
+
+---
+
+## IAM and Access Control
+
+- [ ] **GCP-IAM-01** — Remove the Editor role from the default Compute Engine service account at project level  
+  `gcloud projects remove-iam-policy-binding <PROJECT> --member="serviceAccount:<SA>" --role="roles/editor"`  
+  *CIS: 1.4 | NIST: PR.AC-4*
+
+- [ ] **GCP-IAM-02** — Create purpose-specific service accounts with only the permissions required per workload  
+  *CIS: 1.5 | NIST: PR.AC-4*
+
+- [ ] **GCP-IAM-03** — Disable the default service account where no service account is required on a VM  
+  *CIS: 1.4 | NIST: PR.AC-4*
+
+- [ ] **GCP-IAM-04** — Do not create or download service account keys; use Workload Identity Federation for external workloads  
+  *CIS: 1.6 | NIST: PR.AC-1*
+
+- [ ] **GCP-IAM-05** — Enforce MFA for all human user accounts in the organization  
+  *CIS: 1.2 | NIST: PR.AC-1*
+
+- [ ] **GCP-IAM-06** — Apply Org Policy constraint to restrict who can create service account keys  
+  `constraints/iam.disableServiceAccountKeyCreation`  
+  *CIS: 1.6 | NIST: PR.AC-4*
+
+- [ ] **GCP-IAM-07** — Enable and configure Access Context Manager for context-aware access to GCP resources  
+  *CIS: 1.15 | NIST: PR.AC-4*
+
+---
+
+## Network Security
+
+- [ ] **GCP-NET-01** — Enable VPC Flow Logs on all subnets, especially production and data-tier subnets  
+  `gcloud compute networks subnets update <SUBNET> --enable-flow-logs --region <REGION>`  
+  *CIS: 3.9 | NIST: DE.CM-1*
+
+- [ ] **GCP-NET-02** — Enable logging on all firewall rules  
+  `gcloud compute firewall-rules update <RULE> --enable-logging`  
+  *CIS: 3.10 | NIST: DE.CM-1*
+
+- [ ] **GCP-NET-03** — Delete or restrict the default-allow-ssh and default-allow-rdp rules  
+  Replace with Identity-Aware Proxy (IAP) for SSH access:  
+  `gcloud compute ssh <INSTANCE> --tunnel-through-iap`  
+  *CIS: 3.6 | NIST: PR.AC-3*
+
+- [ ] **GCP-NET-04** — Delete the default VPC network and create custom VPCs with explicit firewall rules  
+  *CIS: 3.1 | NIST: PR.AC-5*
+
+- [ ] **GCP-NET-05** — Enable Private Google Access for subnets to allow VM access to Google APIs without public IPs  
+  *CIS: 3.8 | NIST: PR.AC-5*
+
+- [ ] **GCP-NET-06** — Enforce Org Policy to prevent external IP assignment on Compute Engine VMs where not required  
+  `constraints/compute.vmExternalIpAccess`  
+  *CIS: 3.9 | NIST: PR.AC-5*
+
+---
+
+## Storage Security
+
+- [ ] **GCP-STG-01** — Enforce uniform bucket-level access (disables ACLs, enforces IAM-only control)  
+  `gsutil uniformbucketlevelaccess set on gs://<BUCKET>`  
+  *CIS: 5.2 | NIST: PR.AC-4*
+
+- [ ] **GCP-STG-02** — Verify public access is disabled; apply Org Policy to prevent public bucket creation  
+  `constraints/storage.publicAccessPrevention`  
+  *CIS: 5.1 | NIST: PR.DS-1*
+
+- [ ] **GCP-STG-03** — Configure CMEK for Cloud Storage buckets handling sensitive data  
+  *CIS: 5.2 | NIST: PR.DS-1*
+
+- [ ] **GCP-STG-04** — Enable bucket lock / retention policies on compliance-relevant buckets  
+  *CIS: 5.3 | NIST: PR.DS-1*
+
+- [ ] **GCP-STG-05** — Enable versioning on critical storage buckets to support recovery and forensics  
+  *CIS: 5.4 | NIST: PR.DS-1*
+
+---
+
+## Encryption and Key Management
+
+- [ ] **GCP-ENC-01** — Configure CMEK for Cloud Storage, BigQuery, and Cloud SQL handling regulated data  
+  *CIS: 5.2 | NIST: PR.DS-1*
+
+- [ ] **GCP-ENC-02** — Enable automatic key rotation in Cloud KMS (recommended: 90-day rotation)  
+  *CIS: 1.10 | NIST: PR.DS-1*
+
+- [ ] **GCP-ENC-03** — Restrict Cloud KMS key access to specific service accounts via IAM; audit regularly  
+  *CIS: 1.10 | NIST: PR.AC-4*
+
+- [ ] **GCP-ENC-04** — Enable audit logging on all Cloud KMS key operations  
+  *CIS: 2.1 | NIST: DE.CM-7*
+
+---
+
+## Logging and Monitoring
+
+- [ ] **GCP-LOG-01** — Enable Data Access Audit Logs for: Cloud Storage, Compute Engine, Cloud KMS, BigQuery, Cloud SQL  
+  *CIS: 2.1 | NIST: DE.CM-7*
+
+- [ ] **GCP-LOG-02** — Configure log sinks to export logs to Cloud Storage for long-term retention  
+  *CIS: 2.3 | NIST: RS.AN-1*
+
+- [ ] **GCP-LOG-03** — Create log-based metric filters and alerts for:
+  - IAM policy changes: `protoPayload.methodName="SetIamPolicy"`
+  - Service account key creation: `protoPayload.methodName="google.iam.admin.v1.CreateServiceAccountKey"`
+  - Firewall rule changes: `resource.type="gce_firewall_rule"`  
+  *CIS: 2.4, 2.5, 2.7 | NIST: DE.AE-3*
+
+- [ ] **GCP-LOG-04** — Enable Security Command Center Standard or Premium; review findings weekly  
+  *CIS: 2.1 | NIST: DE.CM-4*
+
+- [ ] **GCP-LOG-05** — Configure log retention to meet compliance requirements (HIPAA: 6 years, PCI-DSS: 1 year)  
+  *CIS: 2.3 | NIST: RS.AN-1*
+
+- [ ] **GCP-LOG-06** — Route critical security logs to a SIEM (Chronicle or third-party) for correlation and alerting  
+  *CIS: 2.2 | NIST: DE.AE-1*

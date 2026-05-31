@@ -1,101 +1,111 @@
 # Cloud IaaS Security Posture Assessment: Azure vs GCP
 
-**Scope:** Default IaaS configuration security evaluation across Microsoft Azure and Google Cloud Platform  
-**Assessment Type:** Configuration review, IAM analysis, network exposure, storage access controls, logging and monitoring gaps  
-**Frameworks:** CIS Benchmarks v2.0 (Azure & GCP), NIST CSF, MITRE ATT&CK
+Default IaaS configurations on Azure and GCP were assessed across five domains — IAM, network security, storage, encryption, and logging — to identify what an organization is exposed to before any hardening is applied.
+
+**12 findings identified: 4 High · 5 Medium · 3 Low**
 
 ---
 
-## Overview
+## Assessment Scope
 
-Default cloud configurations are not secure configurations. This assessment evaluates what an organization actually gets when they spin up IaaS resources in Azure and GCP without modifying defaults — and what that means from an attacker's perspective.
+| | Azure | GCP |
+|---|---|---|
+| Compute | B1s VM, Windows Server 2022, East US | e2-micro, Debian 11, us-central1 |
+| Storage | General Purpose v2 Storage Account | Regional Cloud Storage Bucket |
+| Network | Default NSG | Default VPC + Default Firewall Rules |
+| IAM | Default RBAC assignments | Default project IAM, Default Compute SA |
+| Monitoring | Defender for Cloud (free tier) | Security Command Center (free tier) |
 
-Both platforms were provisioned using free-tier defaults. Azure VMs (B1s), GCP Compute Engine instances (e2-micro), storage buckets, and associated IAM configurations were assessed across five domains: IAM and access control, network security, storage security, encryption and key management, and logging and monitoring.
+Both environments provisioned using free-tier defaults. No post-provisioning changes before assessment.
 
-**12 findings were identified** — 4 High, 5 Medium, 3 Low — spanning both platforms. All findings map to CIS Benchmark controls and include remediation guidance.
-
-> Conducted as part of graduate-level cloud security research at George Mason University (MS, Applied Information Technology — Cybersecurity Concentration).
+See [Environment Architecture](./architecture/environment-setup.md) for full setup and network topology.
 
 ---
 
-## Key Findings Summary
+## Findings
 
 | ID | Platform | Finding | Severity |
 |----|----------|---------|----------|
-| AZ-001 | Azure | NSG Flow Logs disabled by default | High |
-| AZ-002 | Azure | Public blob access enabled on storage accounts | High |
-| AZ-003 | Azure | VM diagnostic logs not enabled by default | Medium |
-| AZ-004 | Azure | Double encryption not enforced by default | Medium |
-| AZ-005 | Azure | Over-permissioned default RBAC role assignments | Medium |
-| GCP-001 | GCP | Default service accounts assigned Editor role | High |
-| GCP-002 | GCP | VPC Flow Logs disabled by default | High |
-| GCP-003 | GCP | Data Access Audit Logs disabled by default | Medium |
-| GCP-004 | GCP | Firewall rule logging disabled by default | Medium |
-| GCP-005 | GCP | CMEK not configured on storage buckets | Low |
-| AZ-006 | Azure | Firewall diagnostic logs require manual activation | Low |
-| GCP-006 | GCP | Default alert thresholds too broad for threat detection | Low |
+| GCP-001 | GCP | Default service accounts assigned Editor role | 🔴 High |
+| GCP-002 | GCP | VPC Flow Logs disabled by default | 🔴 High |
+| AZ-001 | Azure | NSG Flow Logs disabled by default | 🔴 High |
+| AZ-002 | Azure | Public blob access enabled on storage accounts | 🔴 High |
+| AZ-003 | Azure | VM diagnostic logs not enabled by default | 🟠 Medium |
+| AZ-004 | Azure | Double encryption not enforced by default | 🟠 Medium |
+| AZ-005 | Azure | Over-permissioned default RBAC role assignments | 🟠 Medium |
+| GCP-003 | GCP | Data Access Audit Logs disabled by default | 🟠 Medium |
+| GCP-004 | GCP | Firewall rule logging disabled by default | 🟠 Medium |
+| GCP-005 | GCP | CMEK not configured on storage buckets | 🟡 Low |
+| AZ-006 | Azure | Firewall diagnostic logs require manual activation | 🟡 Low |
+| GCP-006 | GCP | Default alert thresholds too broad for threat detection | 🟡 Low |
+
+Full findings with remediation: [`findings/`](./findings/)
 
 ---
 
-## Repository Structure
+## Key Numbers
 
-```
-cloud-iaas-security-assessment/
-├── findings/
-│   ├── azure-findings.md          # Detailed Azure findings with evidence and remediation
-│   ├── gcp-findings.md            # Detailed GCP findings with evidence and remediation
-│   └── findings-summary.md       # Side-by-side platform comparison
-├── methodology/
-│   └── assessment-approach.md    # Environment setup, tooling, and evaluation criteria
-├── remediation/
-│   ├── azure-hardening-checklist.md
-│   └── gcp-hardening-checklist.md
-├── evidence/
-│   └── README.md                  # Screenshots and config exports from test environments
-└── references/
-    └── frameworks.md              # CIS Benchmark controls, NIST CSF mappings
-```
+- 7 of 12 findings are detection gaps — logging and monitoring defaults leave both platforms near-blind
+- Zero network flow logging on either platform by default
+- GCP-001: default Editor SA enables full project access from any compromised VM via the metadata endpoint
+- AZ-002: public blob access is on by default — data reachable without authentication
+- Both platforms: data access audit logs off by default, storage reads leave no trace
 
 ---
 
-## Tools and Platforms Used
-
-- Microsoft Azure Portal — VM and storage provisioning, NSG review, IAM role inspection
-- Google Cloud Console — Compute Engine, Cloud Storage, IAM, VPC review
-- Microsoft Defender for Cloud — default security posture dashboard review
-- Google Security Command Center (SCC) — default findings review
-- CIS Benchmarks for Azure and GCP — control mapping
-- NIST CSF — risk categorization
-
----
-
-## Platform Comparison: TL;DR
+## Platform Comparison
 
 | Domain | Azure | GCP |
 |--------|-------|-----|
-| IAM defaults | RBAC available; over-permissioned defaults | Editor-role service accounts; high privilege escalation risk |
-| Network logging | NSG Flow Logs OFF by default | VPC Flow Logs OFF by default |
-| Storage access | Public blob access ON by default | Public access OFF by default ✓ |
-| Encryption | AES-256 default; CMK requires configuration | AES-256 default; CMEK requires configuration |
-| Audit logging | Activity logs on; Diagnostic logs require enablement | Cloud Audit Logs on; Data Access logs OFF by default |
-| Native SIEM | Microsoft Sentinel (native) | Chronicle (third-party setup required) |
-| Log retention | 30–90 days depending on service | 30 days default; free long-term via Cloud Storage |
+| IAM defaults | Broad RBAC at subscription level | Editor role on default service accounts |
+| Network logging | NSG Flow Logs OFF | VPC Flow Logs OFF |
+| Default firewall exposure | NSG required; no implicit allow | SSH/RDP open to 0.0.0.0/0 |
+| Storage public access | ON by default | OFF by default |
+| Data access logging | OFF by default | OFF by default |
+| Native SIEM | Sentinel (built-in) | Chronicle (third-party) |
+| Log retention default | 30–90 days | 30 days; free long-term via GCS |
 
 ---
 
-## Remediation Approach
+## Tools Used
 
-All findings include:
-- Specific remediation steps (not generic advice)
-- CIS Benchmark control reference
-- Risk context mapped to MITRE ATT&CK where applicable
-
-See [`remediation/`](./remediation/) for platform-specific hardening checklists.
+- Azure Portal, Azure Cloud Shell
+- GCP Cloud Console, GCP Cloud Shell
+- Microsoft Defender for Cloud
+- Google Security Command Center
+- CIS Benchmark for Azure v2.0
+- CIS Benchmark for GCP v1.3
+- NIST CSF, MITRE ATT&CK
 
 ---
 
-## Related Work
+## Repo Structure
 
-- [Ransomware Threat Detection — Hybrid ML + Signature Model](https://github.com/)  
-- [Network & Digital Forensics Lab Work](https://github.com/)
+```
+cloud-iaas-security-assessment/
+├── executive-summary.md
+├── conclusion.md
+├── architecture/
+│   └── environment-setup.md
+├── findings/
+│   ├── azure-findings.md
+│   ├── gcp-findings.md
+│   ├── findings-summary.md
+│   └── risk-matrix.md
+├── methodology/
+│   └── assessment-approach.md
+├── remediation/
+│   ├── azure-hardening-checklist.md
+│   ├── gcp-hardening-checklist.md
+│   └── top-5-priorities.md
+├── evidence/
+│   └── README.md
+└── references/
+    └── frameworks.md
+```
 
+---
+
+## License
+
+[MIT](./LICENSE)

@@ -1,12 +1,24 @@
 # Cloud IaaS Security Posture Assessment: Azure vs GCP
 
-Default IaaS configurations on Azure and GCP were assessed across five domains — IAM, network security, storage, encryption, and logging — to identify what an organization is exposed to before any hardening is applied.
+## Overview
 
-**12 findings identified: 4 High · 5 Medium · 3 Low**
+Cloud providers ship default IaaS configurations that are functional but not secure. Organizations that deploy infrastructure on Azure or GCP without applying post-provisioning hardening inherit security gaps across IAM, network controls, storage, encryption, and logging — most of which generate no alerts and produce no audit trail.
+
+This project assesses exactly what those gaps are. Default configurations on both Microsoft Azure and Google Cloud Platform were provisioned and evaluated against CIS Benchmarks, NIST CSF, and MITRE ATT&CK to identify what an organization is exposed to on day one — before any security team touches the environment.
 
 ---
 
-## Assessment Scope
+## Why This Assessment Exists
+
+Most cloud security guidance focuses on what to enable. This project focuses on what's missing by default — and why that matters.
+
+A VM deployed on GCP with default settings gets a service account with Editor-level access to the entire project. A storage account created on Azure has public blob access enabled by default. Neither platform enables network flow logging, data access audit logs, or meaningful detection coverage out of the box. These aren't theoretical risks. They're the actual starting state.
+
+The goal is to document these defaults, quantify the exposure, and provide platform-specific remediation that maps directly to industry frameworks.
+
+---
+
+## Scope
 
 | | Azure | GCP |
 |---|---|---|
@@ -16,54 +28,27 @@ Default IaaS configurations on Azure and GCP were assessed across five domains �
 | IAM | Default RBAC assignments | Default project IAM, Default Compute SA |
 | Monitoring | Defender for Cloud (free tier) | Security Command Center (free tier) |
 
-Both environments provisioned using free-tier defaults. No post-provisioning changes before assessment.
-
-See [Environment Architecture](./architecture/environment-setup.md) for full setup and network topology.
+Both environments provisioned using free-tier defaults. No post-provisioning changes applied before assessment.
 
 ---
 
-## Findings
+## Findings at a Glance
 
-| ID | Platform | Finding | Severity |
-|----|----------|---------|----------|
-| GCP-001 | GCP | Default service accounts assigned Editor role | 🔴 High |
-| GCP-002 | GCP | VPC Flow Logs disabled by default | 🔴 High |
-| AZ-001 | Azure | NSG Flow Logs disabled by default | 🔴 High |
-| AZ-002 | Azure | Public blob access enabled on storage accounts | 🔴 High |
-| AZ-003 | Azure | VM diagnostic logs not enabled by default | 🟠 Medium |
-| AZ-004 | Azure | Double encryption not enforced by default | 🟠 Medium |
-| AZ-005 | Azure | Over-permissioned default RBAC role assignments | 🟠 Medium |
-| GCP-003 | GCP | Data Access Audit Logs disabled by default | 🟠 Medium |
-| GCP-004 | GCP | Firewall rule logging disabled by default | 🟠 Medium |
-| GCP-005 | GCP | CMEK not configured on storage buckets | 🟡 Low |
-| AZ-006 | Azure | Firewall diagnostic logs require manual activation | 🟡 Low |
-| GCP-006 | GCP | Default alert thresholds too broad for threat detection | 🟡 Low |
-
-Full findings with remediation: [`findings/`](./findings/)
-
----
-
-## Key Numbers
+**12 findings identified: 4 High · 5 Medium · 3 Low**
 
 - 7 of 12 findings are detection gaps — logging and monitoring defaults leave both platforms near-blind
 - Zero network flow logging on either platform by default
-- GCP-001: default Editor SA enables full project access from any compromised VM via the metadata endpoint
-- AZ-002: public blob access is on by default — data reachable without authentication
-- Both platforms: data access audit logs off by default, storage reads leave no trace
+- GCP default service account grants Editor role — full project access from any compromised VM
+- Azure storage accounts ship with public blob access enabled — data reachable without authentication
+- Neither platform enables data access audit logs by default — storage reads leave no trace
 
 ---
 
-## Platform Comparison
+## Frameworks Applied
 
-| Domain | Azure | GCP |
-|--------|-------|-----|
-| IAM defaults | Broad RBAC at subscription level | Editor role on default service accounts |
-| Network logging | NSG Flow Logs OFF | VPC Flow Logs OFF |
-| Default firewall exposure | NSG required; no implicit allow | SSH/RDP open to 0.0.0.0/0 |
-| Storage public access | ON by default | OFF by default |
-| Data access logging | OFF by default | OFF by default |
-| Native SIEM | Sentinel (built-in) | Chronicle (third-party) |
-| Log retention default | 30–90 days | 30 days; free long-term via GCS |
+- **CIS Benchmarks** — Azure v2.0, GCP v1.3 (control-level mapping for each finding)
+- **NIST Cybersecurity Framework** — Risk categorization across Identify, Protect, Detect, Respond, Recover
+- **MITRE ATT&CK** — Tactic and technique mapping for each finding to model attacker behavior against default configurations
 
 ---
 
@@ -73,36 +58,35 @@ Full findings with remediation: [`findings/`](./findings/)
 - GCP Cloud Console, GCP Cloud Shell
 - Microsoft Defender for Cloud
 - Google Security Command Center
-- CIS Benchmark for Azure v2.0
-- CIS Benchmark for GCP v1.3
-- NIST CSF, MITRE ATT&CK
 
 ---
 
-## Repo Structure
+## Repository Structure
 
 ```
 cloud-iaas-security-assessment/
-├── executive-summary.md
-├── conclusion.md
-├── architecture/
-│   └── environment-setup.md
-├── findings/
-│   ├── azure-findings.md
-│   ├── gcp-findings.md
-│   ├── findings-summary.md
-│   └── risk-matrix.md
-├── methodology/
-│   └── assessment-approach.md
+├── README.md                              — Project overview and scope
+├── analysis/
+│   ├── analysis.md                        — Platform comparison, risk matrix, MITRE mapping, detection gaps
+│   ├── azure-default-gaps.md              — Azure default configuration deficiencies (AZ-001 to AZ-006)
+│   └── gcp-default-gaps.md                — GCP default configuration deficiencies (GCP-001 to GCP-006)
 ├── remediation/
-│   ├── azure-hardening-checklist.md
-│   ├── gcp-hardening-checklist.md
-│   └── top-5-priorities.md
-├── evidence/
-│   └── README.md
-└── references/
-    └── frameworks.md
+│   ├── remediation.md                     — Fixes applied to close identified gaps
+│   ├── azure-hardening-checklist.md       — Azure-specific hardening steps mapped to CIS controls
+│   └── gcp-hardening-checklist.md         — GCP-specific hardening steps mapped to CIS controls
+├── docs/
+│   └── project-report.pdf                 — Full project report
+├── overall-findings.md                    — Key findings, outcomes, and how defaults can be improved
+├── references.md                          — Framework references and external sources
+├── LICENSE                                — MIT
+└── .gitignore
 ```
+
+---
+
+## How to Read This Repo
+
+Start with the **analysis/** folder to understand what's deficient on each platform and how the gaps compare. Move to **remediation/** to see what fixes address those gaps and the step-by-step checklists for each provider. **overall-findings.md** ties it together — what was done, what came out of it, and how these findings help organizations harden default cloud deployments. The full project report is in **docs/**.
 
 ---
 

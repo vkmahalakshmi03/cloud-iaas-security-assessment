@@ -132,8 +132,5 @@ The hardening steps documented in this project are not optional security enhance
 
 **Frameworks:** CIS Benchmark for Azure v2.0, CIS Benchmark for GCP v1.3, NIST Cybersecurity Framework, MITRE ATT&CK
 
----
 
-## License
 
-[MIT](./LICENSE)

@@ -8,6 +8,33 @@ This project evaluates the default security posture of Infrastructure-as-a-Servi
 
 ---
 
+## Repository Structure
+
+```
+cloud-iaas-security-assessment/
+│
+├── README.md                                  ← Full project overview
+│
+├── analysis/
+│   ├── default-config-comparison.md           ← Azure vs GCP defaults compared domain by domain
+│   ├── azure-default-gaps.md                  ← Azure deficiencies: AZ-001 through AZ-006
+│   └── gcp-default-gaps.md                    ← GCP deficiencies: GCP-001 through GCP-006
+│
+├── remediation/
+│   ├── key-findings.md                        ← Key findings, outcomes, and real-world implications
+│   ├── azure-hardening-checklist.md           ← Azure hardening steps mapped to CIS controls
+│   └── gcp-hardening-checklist.md             ← GCP hardening steps mapped to CIS controls
+│
+├── docs/
+│   └── project-report.pdf                     ← Full project report
+│
+├── references.md                              ← Framework and tool references
+├── LICENSE                                    ← MIT
+└── .gitignore
+```
+
+---
+
 ## What Was Done
 
 The assessment followed a structured approach across four phases:
@@ -96,33 +123,6 @@ Default IAM assignments create lateral movement paths that persist until someone
 Compliance requirements compound the problem. PCI-DSS requires 12 months of log retention. HIPAA requires 6 years. Both platforms default to 30-day retention. An organization that deploys and assumes the defaults meet compliance is accumulating audit risk from day one.
 
 The hardening steps documented in this project are not optional security enhancements — they're the baseline that needs to be in place before any workload should be considered production-ready.
-
----
-
-## Repository Structure
-
-```
-cloud-iaas-security-assessment/
-│
-├── README.md                                  ← Full project overview
-│
-├── analysis/
-│   ├── default-config-comparison.md           ← Azure vs GCP defaults compared domain by domain
-│   ├── azure-default-gaps.md                  ← Azure deficiencies: AZ-001 through AZ-006
-│   └── gcp-default-gaps.md                    ← GCP deficiencies: GCP-001 through GCP-006
-│
-├── remediation/
-│   ├── key-findings.md                        ← Key findings, outcomes, and real-world implications
-│   ├── azure-hardening-checklist.md           ← Azure hardening steps mapped to CIS controls
-│   └── gcp-hardening-checklist.md             ← GCP hardening steps mapped to CIS controls
-│
-├── docs/
-│   └── project-report.pdf                     ← Full project report
-│
-├── references.md                              ← Framework and tool references
-├── LICENSE                                    ← MIT
-└── .gitignore
-```
 
 ---
 

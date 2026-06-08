@@ -47,7 +47,7 @@ Mapped to CIS Azure Benchmark v2.0. Apply these controls immediately after provi
 
 ## Storage Security
 
-- [ ] **AZ-STG-01** — Disable public blob access at the storage account level for all accounts  
+- [ ] **AZ-STG-01** — Disable public blob access at the storage account level  
   `az storage account update --name <NAME> --allow-blob-public-access false`  
   *CIS: 3.5 | NIST: PR.DS-1*
 
@@ -95,10 +95,10 @@ Mapped to CIS Azure Benchmark v2.0. Apply these controls immediately after provi
 - [ ] **AZ-LOG-03** — Enable Microsoft Defender for Cloud on all subscriptions (Standard tier for production)  
   *CIS: 2.1 | NIST: DE.CM-4*
 
-- [ ] **AZ-LOG-04** — Configure Microsoft Sentinel with data connectors for: Azure AD, Azure Activity, Microsoft Defender  
+- [ ] **AZ-LOG-04** — Configure Microsoft Sentinel with data connectors for Azure AD, Azure Activity, Microsoft Defender  
   *CIS: 5.3 | NIST: DE.AE-1*
 
-- [ ] **AZ-LOG-05** — Create alert rules in Sentinel for: IAM changes, resource deletions, failed authentications, privilege escalation  
+- [ ] **AZ-LOG-05** — Create alert rules in Sentinel for IAM changes, resource deletions, failed authentications, privilege escalation  
   *CIS: 5.2 | NIST: DE.AE-3*
 
 - [ ] **AZ-LOG-06** — Set log retention to minimum 1 year in Log Analytics Workspace (regulatory requirement for HIPAA/FedRAMP)  

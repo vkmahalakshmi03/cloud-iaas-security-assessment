@@ -26,9 +26,11 @@ cloud-iaas-security-assessment/
 │   └── gcp-hardening-checklist.md             ← GCP hardening steps mapped to CIS controls
 │
 ├── docs/
-│   └── project-report.pdf                     ← Full project report
+│   └── Evaluating the Security Posture of Default IaaS Configurations in Azure vs Google Cloud.pdf                     ← Full project report
 │
-├── references.md                              ← Framework and tool references
+├── reference/
+│   └── references.md                          ← Framework and tool references
+│
 ├── LICENSE                                    ← MIT
 └── .gitignore
 ```

@@ -8,35 +8,6 @@ This project evaluates the default security posture of Infrastructure-as-a-Servi
 
 ---
 
-## Repository Structure
-
-```
-cloud-iaas-security-assessment/
-│
-├── README.md                                  ← Full project overview
-│
-├── analysis/
-│   ├── default-config-comparison.md           ← Azure vs GCP defaults compared domain by domain
-│   ├── azure-default-gaps.md                  ← Azure deficiencies: AZ-001 through AZ-006
-│   └── gcp-default-gaps.md                    ← GCP deficiencies: GCP-001 through GCP-006
-│
-├── remediation/
-│   ├── key-findings.md                        ← Key findings, outcomes, and real-world implications
-│   ├── azure-hardening-checklist.md           ← Azure hardening steps mapped to CIS controls
-│   └── gcp-hardening-checklist.md             ← GCP hardening steps mapped to CIS controls
-│
-├── docs/
-│   └── Evaluating the Security Posture of Default IaaS Configurations in Azure vs Google Cloud.pdf                     ← Full project report
-│
-├── reference/
-│   └── references.md                          ← Framework and tool references
-│
-├── LICENSE                                    ← MIT
-└── .gitignore
-```
-
----
-
 ## What Was Done
 
 The assessment followed a structured approach across four phases:
@@ -128,11 +99,44 @@ The hardening steps documented in this project are not optional security enhance
 
 ---
 
+## Repository Structure
+
+```
+cloud-iaas-security-assessment/
+│
+├── README.md                                  ← Full project overview
+│
+├── analysis/
+│   ├── default-config-comparison.md           ← Azure vs GCP defaults compared domain by domain
+│   ├── azure-default-gaps.md                  ← Azure deficiencies: AZ-001 through AZ-006
+│   ├── gcp-default-gaps.md                    ← GCP deficiencies: GCP-001 through GCP-006
+│   └── compliance-mapping.md                  ← Findings mapped to PCI-DSS, HIPAA, SOC 2, FedRAMP
+│
+├── remediation/
+│   ├── key-findings.md                        ← Key findings, outcomes, and real-world implications
+│   ├── azure-hardening-checklist.md           ← Azure hardening steps mapped to CIS controls
+│   └── gcp-hardening-checklist.md             ← GCP hardening steps mapped to CIS controls
+│
+├── docs/
+│   └── Evaluating the Security Posture of Default IaaS Configurations in Azure vs Google Cloud.pdf
+│
+├── reference/
+│   └── references.md                          ← Framework and tool references
+│
+├── LICENSE                                    ← MIT
+└── .gitignore
+```
+
+---
+
 ## Tools and Frameworks
 
 **Assessment tools:** Azure Portal, Azure Cloud Shell, GCP Cloud Console, GCP Cloud Shell, Microsoft Defender for Cloud, Google Security Command Center
 
 **Frameworks:** CIS Benchmark for Azure v2.0, CIS Benchmark for GCP v1.3, NIST Cybersecurity Framework, MITRE ATT&CK
 
+---
 
+## License
 
+[MIT](./LICENSE)

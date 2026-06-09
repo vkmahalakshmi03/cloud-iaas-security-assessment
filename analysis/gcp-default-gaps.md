@@ -1,5 +1,10 @@
 # GCP Default Configuration Deficiencies
 
+> **Assessment Date:** April 2025  
+> **Version:** 1.0  
+> **Platform:** Google Cloud Platform (e2-micro VM, Debian 11, us-central1; Regional Cloud Storage Bucket)  
+> **Benchmark:** CIS GCP Benchmark v1.3
+
 Six security gaps identified in GCP's default IaaS configuration. Each finding includes the default state, what it exposes, the associated risk, and framework mapping.
 
 ---

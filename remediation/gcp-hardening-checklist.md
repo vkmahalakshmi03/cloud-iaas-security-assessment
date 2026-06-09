@@ -1,6 +1,19 @@
 # GCP IaaS Hardening Checklist
 
+> **Assessment Date:** April 2025  
+> **Version:** 1.0  
+> **Benchmark:** CIS GCP Benchmark v1.3  
+> **Controls:** 30 across IAM, Network, Storage, Encryption, Logging
+
 Mapped to CIS GCP Benchmark v1.3. Apply these controls immediately after provisioning any IaaS environment.
+
+---
+
+## Prerequisites
+
+- **Required role:** Project Owner or IAM Admin for IAM changes; Editor for resource configuration changes; Organization Admin for Org Policy constraints
+- **Tools:** Google Cloud CLI (`gcloud`) installed and authenticated, or Cloud Shell access
+- **Dependencies:** Cloud KMS keyring must be created before configuring CMEK. Log sink destination (Cloud Storage bucket) must exist before configuring log exports.
 
 ---
 
@@ -24,6 +37,8 @@ Mapped to CIS GCP Benchmark v1.3. Apply these controls immediately after provisi
 
 - [ ] **GCP-IAM-06** — Use Workload Identity Federation for external service authentication; eliminate long-lived service account keys  
   *CIS: 1.7 | NIST: PR.AC-1*
+
+**Verify:** `gcloud projects get-iam-policy <PROJECT> --format=json | jq '.bindings[] | select(.role=="roles/editor")'` — confirm the default Compute Engine SA no longer holds Editor.
 
 ---
 
@@ -49,6 +64,8 @@ Mapped to CIS GCP Benchmark v1.3. Apply these controls immediately after provisi
   `constraints/compute.vmExternalIpAccess`  
   *CIS: 3.9 | NIST: PR.AC-5*
 
+**Verify:** `gcloud compute networks subnets list --format="table(name,region,enableFlowLogs)"` — confirm flow logs are enabled on all subnets.
+
 ---
 
 ## Storage Security
@@ -70,6 +87,8 @@ Mapped to CIS GCP Benchmark v1.3. Apply these controls immediately after provisi
 - [ ] **GCP-STG-05** — Enable versioning on critical storage buckets to support recovery and forensics  
   *CIS: 5.4 | NIST: PR.DS-1*
 
+**Verify:** `gsutil publicAccessPrevention get gs://<BUCKET>` — confirm public access prevention is enforced. `gsutil uniformbucketlevelaccess get gs://<BUCKET>` — confirm uniform access is enabled.
+
 ---
 
 ## Encryption and Key Management
@@ -88,6 +107,8 @@ Mapped to CIS GCP Benchmark v1.3. Apply these controls immediately after provisi
 
 - [ ] **GCP-ENC-05** — Enable key destruction protection; configure scheduled destruction delay (minimum 24 hours)  
   *CIS: 1.10 | NIST: PR.DS-1*
+
+**Verify:** `gcloud kms keys list --location=<LOCATION> --keyring=<KEYRING> --format="table(name,rotationPeriod,nextRotationTime)"` — confirm rotation is configured and scheduled.
 
 ---
 
@@ -110,3 +131,5 @@ Mapped to CIS GCP Benchmark v1.3. Apply these controls immediately after provisi
 
 - [ ] **GCP-LOG-06** — Set log retention to minimum 1 year via Cloud Storage routing (regulatory requirement for HIPAA/FedRAMP)  
   *CIS: 2.2 | NIST: RS.AN-1*
+
+**Verify:** `gcloud logging sinks list --format="table(name,destination,filter)"` — confirm log sinks exist and are routing to the correct Cloud Storage bucket.

@@ -1,5 +1,10 @@
 # Key Findings
 
+> **Assessment Date:** April 2025  
+> **Version:** 1.0  
+> **Scope:** Azure and GCP default IaaS configurations  
+> **Findings:** 4 High · 5 Medium · 3 Low
+
 ---
 
 ## Assessment Outcome

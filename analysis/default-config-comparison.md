@@ -1,5 +1,9 @@
 # Default Configuration Comparison: Azure vs GCP
 
+> **Assessment Date:** April 2025  
+> **Version:** 1.0  
+> **Frameworks:** CIS Azure v2.0, CIS GCP v1.3, NIST CSF, MITRE ATT&CK
+
 Side-by-side evaluation of what each platform ships by default across five security domains. No hardening applied — these are the configurations that exist the moment provisioning completes.
 
 ---
@@ -109,3 +113,35 @@ The critical shared gap: both platforms disable the logging categories that matt
 | Logging | Sentinel available but logs disabled | Chronicle requires setup; logs disabled |
 
 Neither platform provides a production-ready security posture by default. The defaults on both sides prioritize operational simplicity — getting resources running — over security. The specific risks differ, but the pattern is the same: critical logging is off, IAM is over-permissioned, and encryption key control is left to the provider.
+
+---
+
+## Assessment Methodology
+
+Each platform was provisioned through its native console (Azure Portal, GCP Cloud Console) using default wizard settings. No post-deployment configuration changes were made before the assessment began. The resulting environments were inspected domain by domain using platform-native tools: Azure Cloud Shell and Microsoft Defender for Cloud (free tier) on Azure; GCP Cloud Shell and Security Command Center (free tier) on GCP.
+
+**Finding prioritization** was based on three factors:
+
+- **Exploitability** — Can this gap be exploited with minimal skill and no prerequisites, or does it require prior access and specific conditions?
+- **Blast radius** — Does exploitation affect a single resource, a resource group, or the entire project/subscription?
+- **Detection blind spot** — Does this gap prevent the organization from detecting that exploitation has occurred?
+
+Findings that scored high on all three (GCP-001, AZ-001, GCP-002, AZ-002) were rated High severity. Findings that require some preconditions or have a narrower blast radius were rated Medium. Findings with low direct exploitation risk or primarily compliance implications were rated Low.
+
+**Frameworks applied:**
+
+| Framework | How It Was Used |
+|-----------|----------------|
+| CIS Benchmark for Azure v2.0 | Control-level mapping for each Azure finding and hardening step |
+| CIS Benchmark for GCP v1.3 | Control-level mapping for each GCP finding and hardening step |
+| NIST CSF | Risk categorization across Identify, Protect, Detect, Respond, Recover |
+| MITRE ATT&CK (Cloud Matrix) | Tactic and technique mapping to model attacker behavior against each gap |
+
+## Scope Limitations
+
+- Assessment reflects configurations at time of testing (April 2025). Cloud providers update defaults — findings should be revalidated periodically
+- Free-tier environments were used. Enterprise provisioning workflows (landing zones, organization policies, management groups) may ship different defaults
+- Assessment focused exclusively on default IaaS configurations — PaaS, SaaS, and managed service defaults were out of scope
+- No automated scanning tools (ScoutSuite, Prowler, etc.) were used. Findings are based on manual configuration review against CIS Benchmark controls and platform documentation
+- Production workload-specific risks (data classification, regulatory requirements, multi-region deployments) were not modeled
+- Testing was limited to the default configurations of compute, storage, networking, IAM, and monitoring. Other services (databases, serverless, container platforms) were not assessed

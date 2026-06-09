@@ -1,5 +1,10 @@
 # Azure Default Configuration Deficiencies
 
+> **Assessment Date:** April 2025  
+> **Version:** 1.0  
+> **Platform:** Microsoft Azure (B1s VM, Windows Server 2022, East US; GPv2 Storage Account)  
+> **Benchmark:** CIS Azure Benchmark v2.0
+
 Six security gaps identified in Azure's default IaaS configuration. Each finding includes the default state, what it exposes, the associated risk, and framework mapping.
 
 ---

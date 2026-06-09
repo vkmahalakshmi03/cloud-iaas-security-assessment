@@ -1,6 +1,19 @@
 # Azure IaaS Hardening Checklist
 
+> **Assessment Date:** April 2025  
+> **Version:** 1.0  
+> **Benchmark:** CIS Azure Benchmark v2.0  
+> **Controls:** 28 across IAM, Network, Storage, Encryption, Logging
+
 Mapped to CIS Azure Benchmark v2.0. Apply these controls immediately after provisioning any IaaS environment.
+
+---
+
+## Prerequisites
+
+- **Required role:** Subscription Owner or User Access Administrator for IAM changes; Contributor for resource configuration changes
+- **Tools:** Azure CLI (`az`) installed and authenticated, or Azure Cloud Shell access
+- **Dependencies:** Log Analytics Workspace must be created before enabling diagnostic settings and flow logs. Key Vault must be provisioned before configuring CMK encryption.
 
 ---
 
@@ -24,6 +37,8 @@ Mapped to CIS Azure Benchmark v2.0. Apply these controls immediately after provi
 - [ ] **AZ-IAM-06** — Enable Azure AD Conditional Access policies; restrict management console access by location and device compliance  
   *CIS: 1.2 | NIST: PR.AC-4*
 
+**Verify:** `az role assignment list --scope /subscriptions/<SUB_ID> --output table` — confirm no unnecessary Owner/Contributor assignments remain at subscription scope.
+
 ---
 
 ## Network Security
@@ -42,6 +57,8 @@ Mapped to CIS Azure Benchmark v2.0. Apply these controls immediately after provi
 
 - [ ] **AZ-NET-05** — Restrict management port access (SSH 22, RDP 3389) using Just-In-Time VM Access  
   *CIS: 7.2 | NIST: PR.AC-3*
+
+**Verify:** `az network watcher flow-log list --location <REGION> --output table` — confirm flow logs are enabled and writing to the target Log Analytics Workspace.
 
 ---
 
@@ -63,6 +80,8 @@ Mapped to CIS Azure Benchmark v2.0. Apply these controls immediately after provi
 - [ ] **AZ-STG-05** — Enable storage account logging for Read, Write, and Delete operations  
   *CIS: 3.10 | NIST: DE.CM-7*
 
+**Verify:** `az storage account show --name <NAME> --query "{publicAccess:allowBlobPublicAccess, httpsOnly:enableHttpsTrafficOnly}"` — confirm public access is false and HTTPS is enforced.
+
 ---
 
 ## Encryption and Key Management
@@ -81,6 +100,8 @@ Mapped to CIS Azure Benchmark v2.0. Apply these controls immediately after provi
 
 - [ ] **AZ-ENC-05** — Restrict Key Vault access using Private Endpoints; remove public network access  
   *CIS: 8.6 | NIST: PR.AC-5*
+
+**Verify:** `az keyvault show --name <VAULT> --query "{softDelete:properties.enableSoftDelete, purgeProtection:properties.enablePurgeProtection}"` — confirm both are true.
 
 ---
 
@@ -103,3 +124,5 @@ Mapped to CIS Azure Benchmark v2.0. Apply these controls immediately after provi
 
 - [ ] **AZ-LOG-06** — Set log retention to minimum 1 year in Log Analytics Workspace (regulatory requirement for HIPAA/FedRAMP)  
   *CIS: 5.1 | NIST: RS.AN-1*
+
+**Verify:** `az monitor diagnostic-settings list --resource <RESOURCE_ID> --output table` — confirm diagnostic settings exist and are routing to the correct workspace. Check Defender for Cloud Secure Score for baseline improvement.
